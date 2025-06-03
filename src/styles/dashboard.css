@@ -342,21 +342,7 @@
 }
 
 .add-url-popup > button {
-    width: fit-content;
-    display: flex;
-    align-items: center;
-    height: fit-content;
-    border: none;
-    background-color: var(--primary);
-    color: white;
-    align-self: flex-end;
-    margin-top: 6px;
-    padding: 12px 68px;
-    border-radius: 4px;
-    font-size: .66rem;
-    cursor: pointer;
-    font-family: Titillium;
-    font-weight: 600;   
+    align-self: flex-end; 
 }
 
 .popup-exit {
@@ -391,22 +377,15 @@
 }
 
 .dashboard-details-buttons > button {
-    width: fit-content;
-    display: flex;
     align-items: center;
-    height: fit-content;
-    /* border: 1px solid var(--primary); */
-    border: none;
-    box-shadow: 0 0 2px rgb(120, 120, 120, .4);
+    align-self: center;
     background-color: white;
     color: var(--primary);
-    padding: 10px 60px;
-    border-radius: 4px;
-    gap: 12px;
-    font-size: .68rem;
-    cursor: pointer;
-    font-family: Titillium;
-    font-weight: 600;   
+}
+
+.dashboard-details-buttons > button:first-child > .button-loader {
+    border-color: rgba(139, 77, 202, 0.275);
+    border-top-color: rgb(140, 77, 202);
 }
 
 .dashboard-details-buttons > button:last-child {

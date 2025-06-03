@@ -4,11 +4,24 @@ import { RiSunFill } from "react-icons/ri"
 import { useAppDispatch, useAppSelector } from "../../redux/hooks"
 import { toggleTheme } from "../../redux/theme"
 
+
 function UserId () {
+    
+    const user = useAppSelector(state => state.userinfo.value)
+    
+    function abbrevName () {
+        if (!user?.name) return "JD"
+        const nameArr = user?.name.split(" ")
+
+        const initials = nameArr.map(name => name[0])
+
+        return initials
+    }
+
     return (
         <div className="topbar-userid">
-            <div>JD</div>
-            <div>johndoe@gmail.com</div>
+            <div>{abbrevName()}</div>
+            <div>{user?.email || "johndoe@gmail.com"}</div>
         </div>
     )
 }
@@ -36,6 +49,7 @@ function ThemeIcon () {
 }
 
 export function Topbar () {
+
     return (
         <div className="topbar">
             <span className="navbar-logo">URLPing</span>

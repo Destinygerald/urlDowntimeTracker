@@ -1,0 +1,4 @@
+- [x] Create a button component to handle loading state of click events @detail.tsx @add-popup.tsx
+- [x] Create the function that handles the toggle pause event without calling the api to update the urls.
+- [] Create the function that handles the update when a new url is added  or a url is paused without calling the api.
+- [] Create the logout function.

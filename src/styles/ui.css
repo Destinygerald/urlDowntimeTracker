@@ -172,6 +172,32 @@
 }
 
 
+.api-call-button {
+    height: 40px;
+    background-color: var(--primary);
+    color: white;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    border: none;
+    min-width: 160px;
+    padding: 12px 68px;
+    border-radius: 4px;
+    font-size: .66rem;
+    cursor: pointer;
+    font-family: Titillium;
+    font-weight: 600;  
+}
+
+.button-loader {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.341);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: rotate 1.6s linear infinite;
+}
+
 @media screen and (max-width: 600px) {
     .signin-button {
         padding: 10px 46px;

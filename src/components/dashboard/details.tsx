@@ -2,9 +2,13 @@ import { useParams, useNavigate } from "react-router-dom"
 import "../../styles/dashboard.css"
 import { useEffect, useState } from "react"
 import { IoIosArrowBack } from "react-icons/io"
-import { fetchDowntimes } from "../../api/fetchdata"
+import { deleteSiteFromWatch, fetchDowntimes, toggleWatch, urlInfo } from "../../api/fetchdata"
 import { parseDateTime, parseTime } from "../../utils/parsers"
 import { Loader } from "../ui/loader"
+import { useAppDispatch } from "../../redux/hooks"
+import { addToQueue } from "../../redux/message-queue"
+import { generateId } from "../../utils/random-id-ge"
+import type { t_updateUrlActions } from "../../pages/dashboard/page"
 
 type T_Downtime = {
     from: number,
@@ -34,30 +38,108 @@ function DowntimeCard ({ from, to, check_rate }: T_Downtime) {
     )
 }
 
-export function Details () {
+type t_details = {
+    updateUrl: (action: t_updateUrlActions, data: any) => void
+}
+
+export function Details ({ updateUrl }: t_details) {
     
     const [ downtimes, setDowntimes ] = useState<any[]>([])
     const [ loading, setLoading ] = useState<boolean>(false)
+    const [ toggleLoading, setToggleLoading ] = useState<boolean>(false)
+    const [ deleteLoading, setDeleteLoading ] = useState<boolean>(false)
+    const [ urlData, setUrlData ] = useState<any>({})
     const { id } = useParams()
     const navigate = useNavigate()
+    const dispatch = useAppDispatch()
 
     function goback () {
         navigate("/dashboard")
     }
 
+    function updateUrlPaused () {
+        setUrlData({...urlData, pause: !urlData.pause })
+    }
+
     async function fetchAllDowntimes () {
         const result =  await fetchDowntimes(id as string)
         
-        if(result.status == 200) {
+        if(result.statusCode == 200) {
             setDowntimes([...result.data])
         }
 
         setLoading(false)
     }
 
+    async function getUrlData () {
+        const result = await urlInfo(id as string)
+
+        if(result.statusCode == 200) {
+            setUrlData(result.data)
+        }
+        navigate("/dashboard")
+        return
+    }
+
+    async function toggleUrlWatchState () {
+        const id = generateId()
+        
+        setToggleLoading(true)
+
+        const res = await toggleWatch(id as string)
+
+        if(res.statusCode == 200) {
+            // success message
+            dispatch(addToQueue({
+                id,        
+                status: "success",
+                message: `Cron ${urlData?.pause ? "resumed": "paused"} Successfully`
+            }))
+
+            updateUrlPaused()
+            setToggleLoading(false)
+        
+            return;
+        }
+        
+        dispatch(addToQueue({
+            id,        
+            status: "failed",
+            message: "Failed to add url, Try again"
+        }))
+        setToggleLoading(false)
+    }
+
+    async function removeUrlWatcher () {
+        const id = generateId()
+        
+        setDeleteLoading(true)
+
+        const res = await deleteSiteFromWatch(id as string)
+
+        if(res.statusCode == 200) {
+            // success message
+            dispatch(addToQueue({
+                id,        
+                status: "success",
+                message: "Successfully deleted url from watchlist"
+            }))
+            
+            setDeleteLoading(false);
+            return;
+        }
+        
+        dispatch(addToQueue({
+            id,        
+            status: "failed",
+            message: "Failed to delete url, Try again"
+        }))
+        setDeleteLoading(false);
+    }
 
     useEffect(() => {
         setLoading(true)
+        getUrlData();
         fetchAllDowntimes()
     }, [])
 
@@ -66,12 +148,35 @@ export function Details () {
             <div className="dashboard-details-header">
                <div>
                     <span onClick={goback}> <IoIosArrowBack /> </span>
-                    <span> https://programming-lab-frontend.onrender.com </span>
+                    <span> {urlData?.website ||  "https://programming-lab-frontend.onrender.com"} </span>
                 </div>
                 
                 <div className="dashboard-details-buttons">
-                   <button>Pause</button>
-                   <button>Delete</button>
+                   <button className="api-call-button"
+                        onClick={toggleUrlWatchState}
+                        disabled={ toggleLoading || deleteLoading }
+                   >
+                        {
+                            !toggleLoading
+                            ?
+                            "Pause"
+                            :
+                            <div className="button-loader" />
+                        }
+                    </button>
+
+                   <button className="api-call-button"
+                        onClick={removeUrlWatcher}
+                        disabled={ toggleLoading || deleteLoading }
+                   >
+                    {
+                        !deleteLoading
+                        ?
+                        "Delete"
+                        :
+                        <div className="button-loader" />
+                    }
+                   </button>
                 </div>
             </div>
 

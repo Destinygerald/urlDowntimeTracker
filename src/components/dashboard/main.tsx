@@ -5,9 +5,9 @@ import "../../styles/dashboard.css"
 import { parseDateTime } from "../../utils/parsers";
 import { useNavigate } from "react-router-dom";
 import type React from "react";
-import { useEffect, useState } from "react";
 import { Loader } from "../ui/loader";
-import { getUrls } from "../../api/fetchdata";
+import { toggleWatch } from "../../api/fetchdata";
+import type { t_updateUrlActions } from "../../pages/dashboard/page";
 
 
 export interface I_Dashboard {
@@ -26,11 +26,12 @@ function DashboardItem ({ id, url, date_added, check_duration, status, paused }:
         navigate(id)
     }
 
-    function togglePause (e: React.PointerEvent<HTMLButtonElement>) {
+    async function togglePause (e: React.PointerEvent<HTMLButtonElement>) {
         e.preventDefault()
         e.stopPropagation()
 
-        if (paused) return;
+        // if (paused) return;
+        await toggleWatch(id)
     }
 
     return (
@@ -56,10 +57,15 @@ function DashboardItem ({ id, url, date_added, check_duration, status, paused }:
     )
 }
 
-export function DashboardMain () {
+type t_dashboardMain = {
+    loading: boolean;
+    urls: I_Dashboard[];
+    setUrls: (arg: any) => void;
+    updateUrl: (action: t_updateUrlActions, data:any) => void;
+}
+
+export function DashboardMain ({ loading, urls, setUrls, updateUrl }: t_dashboardMain) {
     
-    const [ urls, setUrls ] = useState<I_Dashboard[]>([])
-    const [ loading, setLoading ] = useState<boolean>(false)
     const newUrlPopupOpen = useAppSelector(state => state.addUrlPopup.value.open) 
     const dispatch = useAppDispatch()
 
@@ -67,20 +73,9 @@ export function DashboardMain () {
         dispatch(openPopup())
     }
 
-    async function getData () {
-        const res = await getUrls()
-
-        if (res && res.status == 200) {
-            setUrls(res.data)
-        }
-
-        setLoading(false)
+    function _updateUrls () {
+        // update the url when the toggle button is clicked        
     }
-
-    useEffect(() => {
-        setLoading(true)
-        getData()
-    }, [])
 
     return (
         <main className="dashboard-main">
@@ -130,7 +125,7 @@ export function DashboardMain () {
             {
                 newUrlPopupOpen
                 ?
-                <AddUrlPopup />
+                <AddUrlPopup updateUrl={updateUrl} />
                 :
                 ""   
             }

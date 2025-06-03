@@ -6,6 +6,9 @@ import { closePopup } from "../../redux/add-url-popup"
 import { useAppDispatch } from "../../redux/hooks"
 import { addToQueue } from "../../redux/message-queue"
 import { generateId } from "../../utils/random-id-ge"
+import { Button } from "./button"
+import { addSiteToWatch } from "../../api/fetchdata"
+import type { t_updateUrlActions } from "../../pages/dashboard/page"
 
 type T_Dropdown = {
     changeDuration: (arg: string) => void;
@@ -57,11 +60,17 @@ function Dropdown ({ changeDuration, duration }: T_Dropdown) {
     )
 }
 
-export function AddUrlPopup () {
+type t_addUrlPopup = {
+    updateUrl: (action: t_updateUrlActions, data: any) => void
+}
+
+export function AddUrlPopup ({ updateUrl }: t_addUrlPopup) {
     const [ newUrl, setNewUrl ] = useState({
         url: "",
         duration: "",
     })
+
+    const [ loading, setLoading ] = useState<boolean>(false)
 
     const dispatch = useAppDispatch()
 
@@ -77,7 +86,7 @@ export function AddUrlPopup () {
         dispatch(closePopup())
     }
 
-    function handleSubmit () {
+    async function handleSubmit () {
         const id = generateId()
 
         if (!newUrl.url || !newUrl.duration) {
@@ -89,6 +98,33 @@ export function AddUrlPopup () {
 
             return;
         }
+
+        setLoading(true)
+
+        const response = await addSiteToWatch(newUrl)
+        
+        if (response && response.statusCode == 201) {
+            dispatch(addToQueue({
+                id,        
+                status: "success",
+                message: "Successfully new Url"
+            }))
+
+            setLoading(false)
+
+            updateUrl("Add", response?.data)
+
+            closePopup()
+            return
+        }
+
+        setLoading(false)
+        dispatch(addToQueue({
+            id,        
+            status: "failed",
+            message: "Failed to add url, Try again"
+        }))
+
     }
     
     return (
@@ -100,7 +136,7 @@ export function AddUrlPopup () {
                 <Dropdown changeDuration={changeDuration} duration={newUrl.duration} />
             </div>
 
-            <button onClick={handleSubmit}>Add Url</button>
+            <Button label="Add Url" clickHandler={handleSubmit} loading={loading} />
 
             <span className="popup-exit" onClick={popupClose}> <BsX /> </span>
         </div>
