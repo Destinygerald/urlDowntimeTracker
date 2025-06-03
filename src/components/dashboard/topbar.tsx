@@ -10,7 +10,7 @@ function UserId () {
     const user = useAppSelector(state => state.userinfo.value)
     
     function abbrevName () {
-        if (!user?.name) return "JD"
+        if (!user?.name) return "--"
         const nameArr = user?.name.split(" ")
 
         const initials = nameArr.map(name => name[0])
@@ -21,7 +21,7 @@ function UserId () {
     return (
         <div className="topbar-userid">
             <div>{abbrevName()}</div>
-            <div>{user?.email || "johndoe@gmail.com"}</div>
+            <div>{user?.email || "-----"}</div>
         </div>
     )
 }

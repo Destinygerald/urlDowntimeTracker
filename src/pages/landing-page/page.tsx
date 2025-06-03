@@ -2,38 +2,12 @@ import "../../styles/landingpage.css"
 import { Navbar } from "../../components/ui/navbar";
 import { FcGoogle } from "react-icons/fc";
 import { Background } from "../../components/ui/background";
-import { useNavigate } from "react-router-dom";
-import { Auth, type t_response } from "../../api/auth";
-import { generateId } from "../../utils/random-id-ge";
-import { addToQueue } from "../../redux/message-queue";
-import { useAppDispatch } from "../../redux/hooks";
+import { Auth } from "../../api/auth";
 
 function PageLeft () {
     
-    const navigate = useNavigate()
-    const dispatch = useAppDispatch()
-
     async function handleAuth () {
-        const res: t_response | void = await Auth()
-        const id = generateId()
-
-        if (!res || res?.status != "success") {
-            // add message to message queue
-            dispatch(addToQueue({
-                id,
-                status: "failed",
-                message: "Authentication Failed"
-            }))
-            return;
-        }
-
-        dispatch(addToQueue({
-            id,
-            status: "success",
-            message: "Successfully Logged in"
-        }))
-        
-        navigate("/dashboard")
+        await Auth()
     }
     
     return (

@@ -1,5 +1,5 @@
 // import { fakeLogin } from "./dummydata";
-import { getCookie, setCookie } from "./utils";
+import { getCookie } from "./utils";
 import axios from "axios";
 
 export type t_response = {
@@ -9,12 +9,8 @@ export type t_response = {
 
 export async function Auth (): Promise<t_response | void | any> {
     try {
-        // const response = await fakeLogin();
-        // return response as t_response;
-        const auth:any = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth`)
-        setCookie(auth?.auth_token as string, "auth_token")
-
-        return auth;
+       
+        window.location.href = `${import.meta.env.VITE_API_URL}/api/auth`
 
     } catch (err) {
         console.error(err);
@@ -26,6 +22,7 @@ export async function Profile () {
     try {
         const cookie = getCookie("auth_token")
 
+
         const profile =  await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/profile`, {
             headers: {
                 'Accept': 'application/json',
@@ -33,7 +30,7 @@ export async function Profile () {
                 'Authorization': 'Bearer ' + cookie
             }
         })
-        return profile;
+        return profile.data;
     } catch (err) {
         console.error(err);
         return;

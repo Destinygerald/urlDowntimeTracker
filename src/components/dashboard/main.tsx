@@ -8,49 +8,89 @@ import type React from "react";
 import { Loader } from "../ui/loader";
 import { toggleWatch } from "../../api/fetchdata";
 import type { t_updateUrlActions } from "../../pages/dashboard/page";
+import { useState } from "react";
+import { generateId } from "../../utils/random-id-ge";
+import { addToQueue } from "../../redux/message-queue";
 
 
 export interface I_Dashboard {
-    id: string;
-    url: string;
+    _id: string;
+    website: string;
     date_added: number;
-    check_duration: string;
-    status: string;
-    paused: boolean;
+    cron_duration: string;
+    running: string;
+    pause: boolean;
 }
 
-function DashboardItem ({ id, url, date_added, check_duration, status, paused }: I_Dashboard) {
+function DashboardItem ({ _id, website, date_added, cron_duration, running, pause, updateUrl }: I_Dashboard & { updateUrl: (action: t_updateUrlActions, data:any) => void }) {
+    
+    const [ loading, setLoading ] = useState<boolean>(false)
     const navigate = useNavigate();
+    const dispatch = useAppDispatch()
 
     function handleNavigate () {
-        navigate(id)
+        navigate(_id)
     }
 
     async function togglePause (e: React.PointerEvent<HTMLButtonElement>) {
         e.preventDefault()
         e.stopPropagation()
+        
+        const id = generateId()
+        setLoading(true)
 
-        // if (paused) return;
-        await toggleWatch(id)
+        // if (pause) return;
+        const res = await toggleWatch(_id)
+
+
+        if(res.status == "success") {
+            // success message
+            dispatch(addToQueue({
+                id,        
+                status: "success",
+                message: `Cron ${pause ? "resumed": "paused"} Successfully`
+            }))
+
+            updateUrl("Update", {
+                _id, website, date_added, cron_duration, running, pause: !pause
+            })
+
+            setLoading(false)
+            return;
+        }
+
+        dispatch(addToQueue({
+            id,        
+            status: "failed",
+            message: `Failed to ${pause ? "resume": "pause"} cron, Try again`
+        }))
+        setLoading(false)   
     }
 
     return (
         <div className="dashboard-table-item" onClick={handleNavigate}>
-            <span>{url}</span>
+            <span>{website}</span>
             <span>{parseDateTime(date_added)}</span>
-            <span>{check_duration}</span>
+            <span>{cron_duration}</span>
             <span>
-                <span className={status.toLowerCase() == 'running' ? "status-up" : "status-down"}>
-                    {status}
+                <span className={running ? "status-up" : "status-down"}>
+                    {running && !pause ? "Running" : running && pause ? "Paused" : "Down"}
                 </span>
             </span>
 
             <span>
                 <button
+                    disabled={loading}
                     onClick={togglePause}
-                    className={paused ? "resume-button" : "pause-button"}
+                    className={pause ? "resume-button" : "pause-button"}
                 >
-                    { paused ? "Resume" : "Pause" }
+                    {
+                        loading
+                        ?
+                        <div className="button-loader" />
+                        :
+                        <>{ pause ? "Resume" : "Pause" }</>
+                    }
                 </button>
             </span>
         </div>
@@ -60,28 +100,25 @@ function DashboardItem ({ id, url, date_added, check_duration, status, paused }:
 type t_dashboardMain = {
     loading: boolean;
     urls: I_Dashboard[];
-    setUrls: (arg: any) => void;
     updateUrl: (action: t_updateUrlActions, data:any) => void;
 }
 
-export function DashboardMain ({ loading, urls, setUrls, updateUrl }: t_dashboardMain) {
+export function DashboardMain ({ loading, urls,  updateUrl }: t_dashboardMain) {
     
     const newUrlPopupOpen = useAppSelector(state => state.addUrlPopup.value.open) 
+    const userInfo = useAppSelector(state => state.userinfo.value)
     const dispatch = useAppDispatch()
 
     function addUrlPopup () {
         dispatch(openPopup())
     }
 
-    function _updateUrls () {
-        // update the url when the toggle button is clicked        
-    }
 
     return (
         <main className="dashboard-main">
             <div className="dashboard-main-top">
                 <div>
-                    <span>Welcome John👋</span>
+                    <span>Welcome {userInfo.name || '---'}👋</span>
                     <span>Good to see you!</span>
                 </div>
 
@@ -111,7 +148,7 @@ export function DashboardMain ({ loading, urls, setUrls, updateUrl }: t_dashboar
                         <div className="dashboard-table-content">
                         {
                            urls.map((data, i) => (
-                                <DashboardItem key={i} id={data.id} url={data.url} date_added={data.date_added} check_duration={data.check_duration} status={data.status} paused={data.paused}  />
+                                <DashboardItem key={i} _id={data._id} website={data.website} date_added={data.date_added} cron_duration={data.cron_duration} running={data.running} pause={data.pause} updateUrl={updateUrl} />
                             ))
                         }
                         </div>

@@ -103,7 +103,7 @@ export function AddUrlPopup ({ updateUrl }: t_addUrlPopup) {
 
         const response = await addSiteToWatch(newUrl)
         
-        if (response && response.statusCode == 201) {
+        if (response && response.status == "created") {
             dispatch(addToQueue({
                 id,        
                 status: "success",

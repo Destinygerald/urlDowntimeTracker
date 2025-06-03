@@ -24,7 +24,7 @@ export async function fetchDowntimes(id:string):Promise<any> {
                 'Authorization': 'Bearer ' + cookie
             }
         })
-        return result.json();
+        return result.data;
     } catch (err) {
         console.log(err)
         return ({ status: 'failed', message: err })
@@ -42,7 +42,7 @@ export async function urlInfo(id:string):Promise<any> {
                 'Authorization': 'Bearer ' + cookie
             }
         })
-        return result.json();
+        return result.data;
     } catch (err) {
         console.log(err)
         return ({ status: 'failed', message: err })
@@ -61,7 +61,7 @@ export async function getUrls ():Promise<any> {
                 'Authorization': 'Bearer ' + cookie
             }
         })
-        return (result as any).json();
+        return result.data;
     } catch (err) {
         console.log(err)
         return ({ status: 'failed', message: err })
@@ -82,7 +82,7 @@ export async function addSiteToWatch (siteinfo: addUrlParams) {
             }
         })
 
-        return response.json();
+        return response.data;
     } catch (err) {
         console.log(err)
         return ({ status: 'failed', message: err })
@@ -101,7 +101,7 @@ export async function deleteSiteFromWatch (id: string) {
             }
         })
 
-        return response.json();
+        return response.data;
     } catch (err) {
         console.log(err)
         return ({ status: 'failed', message: err })
@@ -112,7 +112,7 @@ export async function toggleWatch (id: string) {
     try {
         const cookie = getCookie("auth_token")
         
-        const response:any = await axios.put(`${import.meta.env.VITE_API_URL}/api/url/toggle-watch/${id}`, {
+        const response:any = await axios.put(`${import.meta.env.VITE_API_URL}/api/url/toggle-watch/${id}`, {} , {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
@@ -120,7 +120,7 @@ export async function toggleWatch (id: string) {
             }
         })
 
-        return response.json();
+        return response.data;
     } catch (err) {
         console.log(err)
         return ({ status: 'failed', message: err })

@@ -78,6 +78,7 @@
 .dashboard-main-top > div:first-child > span:first-child {
     font-size: clamp(1.2rem, 1.6vw, 1.48rem);
     font-weight: 600;
+    text-transform: capitalize;
 }
 
 .dashboard-main-top > div:first-child > span:last-child {
@@ -238,6 +239,9 @@
 .pause-button, .resume-button {
     width: fit-content;
     font-size: .72rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-family: Titillium;
     border: none;
     padding: 7px 48px;
@@ -247,6 +251,13 @@
     cursor: pointer;
     border: 1px solid var(--primary);
     color: var(--primary);
+    min-width: 140px;
+    height: 34px;
+}
+
+.pause-button .button-loader {
+    border-color: rgba(139, 77, 202, 0.275);
+    border-top-color: rgb(140, 77, 202);
 }
 
 .resume-button {

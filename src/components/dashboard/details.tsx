@@ -64,8 +64,10 @@ export function Details ({ updateUrl }: t_details) {
     async function fetchAllDowntimes () {
         const result =  await fetchDowntimes(id as string)
         
-        if(result.statusCode == 200) {
+        if(result.status == "success") {
             setDowntimes([...result.data])
+            setLoading(false)
+            return;
         }
 
         setLoading(false)
@@ -74,8 +76,9 @@ export function Details ({ updateUrl }: t_details) {
     async function getUrlData () {
         const result = await urlInfo(id as string)
 
-        if(result.statusCode == 200) {
-            setUrlData(result.data)
+        if(result.status == "success") {
+            setUrlData(result.data._doc)
+            return;
         }
         navigate("/dashboard")
         return
@@ -86,9 +89,9 @@ export function Details ({ updateUrl }: t_details) {
         
         setToggleLoading(true)
 
-        const res = await toggleWatch(id as string)
+        const res = await toggleWatch(urlData?._id as string)
 
-        if(res.statusCode == 200) {
+        if(res.status == "success") {
             // success message
             dispatch(addToQueue({
                 id,        
@@ -96,16 +99,17 @@ export function Details ({ updateUrl }: t_details) {
                 message: `Cron ${urlData?.pause ? "resumed": "paused"} Successfully`
             }))
 
+            updateUrl("Update", {...urlData, pause: !urlData.pause })
             updateUrlPaused()
             setToggleLoading(false)
-        
+            
             return;
         }
         
         dispatch(addToQueue({
             id,        
             status: "failed",
-            message: "Failed to add url, Try again"
+            message: `Failed to ${urlData?.pause ? "resume": "pause"} cron, Try again`
         }))
         setToggleLoading(false)
     }
@@ -115,9 +119,9 @@ export function Details ({ updateUrl }: t_details) {
         
         setDeleteLoading(true)
 
-        const res = await deleteSiteFromWatch(id as string)
+        const res = await deleteSiteFromWatch(urlData?._id as string)
 
-        if(res.statusCode == 200) {
+        if(res.status == "success") {
             // success message
             dispatch(addToQueue({
                 id,        
@@ -126,6 +130,7 @@ export function Details ({ updateUrl }: t_details) {
             }))
             
             setDeleteLoading(false);
+            updateUrl("Delete", urlData)
             return;
         }
         
@@ -143,12 +148,13 @@ export function Details ({ updateUrl }: t_details) {
         fetchAllDowntimes()
     }, [])
 
+
     return (
         <div className="dashboard-details">
             <div className="dashboard-details-header">
                <div>
                     <span onClick={goback}> <IoIosArrowBack /> </span>
-                    <span> {urlData?.website ||  "https://programming-lab-frontend.onrender.com"} </span>
+                    <span> {urlData?.website ||  "---"} </span>
                 </div>
                 
                 <div className="dashboard-details-buttons">
@@ -159,7 +165,7 @@ export function Details ({ updateUrl }: t_details) {
                         {
                             !toggleLoading
                             ?
-                            "Pause"
+                            urlData?.pause ? "Resume" : "Pause"
                             :
                             <div className="button-loader" />
                         }
