@@ -1,12 +1,5 @@
-// import type { I_Dashboard } from "../components/dashboard/main";
-import { _downtimes, _getUrls } from "./dummydata";
 import axios from "axios";
 import { getCookie } from "./utils";
-
-// type t_UrLresponse = {
-//     status: number,
-//     data: I_Dashboard[]
-// }
 
 type addUrlParams = {
     url: string,
@@ -15,7 +8,6 @@ type addUrlParams = {
 
 export async function fetchDowntimes(id:string):Promise<any> {
     try {
-        // const result = await _downtimes()
         const cookie = getCookie("auth_token")
         const result:any = await axios.get(`${import.meta.env.VITE_API_URL}/api/url/${id}/downtimes`, {
             headers: {
