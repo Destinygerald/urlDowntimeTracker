@@ -40,6 +40,7 @@
 
 .topbar-userid > div:first-child {
     width: 32px;
+    text-transform: uppercase;
     height: 32px;
     font-weight: 700;
     background-color: rgb(90, 23, 158, .2);

@@ -20,7 +20,7 @@ function PageLeft () {
 
             <button className="signin-button" onClick={handleAuth}>
                 <span><FcGoogle /></span>
-                <span>Sign up with Google</span>
+                <span>Sign in with Google</span>
             </button>
         </div> 
     )

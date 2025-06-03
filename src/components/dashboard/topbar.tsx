@@ -26,13 +26,19 @@ function UserId () {
     )
 }
 
-function ThemeIcon () {
+export function ThemeIcon () {
 
     const theme = useAppSelector(state => state.theme.value)
     const dispatch = useAppDispatch()
     
     function handleToggle () {
         dispatch(toggleTheme())
+
+        if (theme == "dark") {
+            window.localStorage.setItem("theme", "light")
+        } else {
+            window.localStorage.setItem("theme", "dark")
+        }
     }
 
     return (

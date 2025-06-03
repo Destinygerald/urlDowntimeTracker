@@ -4,7 +4,7 @@ import LandingPage from "../../pages/landing-page/page.tsx"
 import Dashboard from "../../pages/dashboard/page.tsx"
 import { useAppDispatch, useAppSelector } from "../../redux/hooks.ts";
 import { useLayoutEffect } from "react";
-import { toggleTheme } from "../../redux/theme.ts";
+import { setTheme, toggleTheme } from "../../redux/theme.ts";
 import { MessageQueue } from './message.tsx';
 
 export function AppRoutes () {
@@ -16,10 +16,21 @@ export function AppRoutes () {
     useLayoutEffect(() => {
         if (!window.matchMedia) return;
 
-        const isDark = window.matchMedia("prefers-color-scheme: dark").matches
-        if (isDark && theme == "dark") {
-            dispatch(toggleTheme())
+        const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+        
+        const _theme: "light" | "dark" = window.localStorage.getItem("theme") as "light" | "dark"
+
+
+      
+        if (isDark && (!_theme || _theme as string == "null")) {
+            dispatch(setTheme("dark"))
+            window.localStorage.setItem("theme", "dark")
+            return;
         }
+
+        dispatch(setTheme(_theme))
+        window.localStorage.setItem("theme", _theme)
+
 
     }, [])
 

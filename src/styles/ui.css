@@ -198,11 +198,25 @@
     animation: rotate 1.6s linear infinite;
 }
 
+.navbar .toggle-theme {
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 2px rgb(var(--color), .4);
+}
+
 @media screen and (max-width: 600px) {
     .signin-button {
         padding: 10px 46px;
         box-shadow: 0 0 2px rgb(var(--color), .2);
-    }  
+    } 
+    
+    .navbar .signin-button {
+        display: none;
+    }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -212,5 +226,5 @@
 }
 
 .app-inner[data-theme="dark"] .background-blur {
-    background-color: rgb(28, 28, 28, .2);
+    background-color: rgba(28, 28, 28, 0.572);
 }
